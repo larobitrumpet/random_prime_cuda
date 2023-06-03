@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-// The base to print the prime number in
-#define BASE 10
-
 // Generates a random number between `lower` and `upper` and stores it in `n`
 unsigned long random_number(unsigned long lower, FILE* urandom) {
     unsigned long n = 0;
