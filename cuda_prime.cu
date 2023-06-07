@@ -3,7 +3,8 @@
 #include <stdbool.h>
 #include <cuda.h>
 
-// Generates a random number between `lower` and `upper` and stores it in `n`
+// Generates a random unsigned long greater than `lower`
+// `uradom` is a file descriptor pointing to `/dev/urandom`
 unsigned long random_number(unsigned long lower, FILE* urandom) {
 	unsigned long n = 0;
 	while (n < lower) {
@@ -18,7 +19,7 @@ unsigned long random_number(unsigned long lower, FILE* urandom) {
 	return n;
 }
 
-// Tests if `n` is prime
+// Tests if `n` is prime and stores the result in `p[threadIdx.x]`
 __global__ void is_prime(const unsigned long n, bool p[]) {
 	int  my_idx = threadIdx.x;
 	unsigned long my_n = n + my_idx * 2;
