@@ -3,8 +3,13 @@
 #include <stdbool.h>
 #include <cuda.h>
 
-// Generates a random unsigned long greater than `lower`
-// `uradom` is a file descriptor pointing to `/dev/urandom`
+
+/**
+ * Generates a random unsigned long greater than `lower`
+ * 
+ * @param lower is lower bound of generated number
+ * @param uradom is a file descriptor pointing to `/dev/urandom`
+ */
 unsigned long random_number(unsigned long lower, FILE* urandom) {
 	unsigned long n = 0;
 	while (n < lower) {
@@ -19,7 +24,13 @@ unsigned long random_number(unsigned long lower, FILE* urandom) {
 	return n;
 }
 
-// Tests if `n` is prime and stores the result in `p[threadIdx.x]`
+/**
+ * Tests if `n` is prime and stores the result in `p[threadIdx.x]`
+ * 
+ * @param n is unsigned long in that will be tested
+ * @param p is a boolean array that stores t/f info
+ * @note This is 32 threads cuda data processing
+ */
 __global__ void is_prime(const unsigned long n, bool p[]) {
 	int  my_idx = threadIdx.x;
 	unsigned long my_n = n + my_idx * 2;
@@ -51,6 +62,12 @@ __global__ void is_prime(const unsigned long n, bool p[]) {
 	return;
 }
 
+/**
+ * Get random number from urandom, initial cuda kernel,
+ * and prints the result.
+ * 
+ * @note This also times the threads
+ */
 int main() {
 
 	FILE* urandom = fopen("/dev/urandom", "rb");
@@ -59,6 +76,7 @@ int main() {
 		exit(1);
 	}
 	
+	//1 block * 32 threads = 32 threads in total
 	int blk_ct = 1;
 	int th_per_blk = 32;
 	unsigned long rand = random_number((unsigned long)1<<32, urandom);
