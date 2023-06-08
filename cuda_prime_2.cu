@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 #include <cuda.h>
 
 // Generates a random unsigned long greater than `lower`
@@ -20,11 +21,11 @@ unsigned long random_number(unsigned long lower, FILE* urandom) {
 }
 
 __global__ void is_prime_part(const unsigned long n, bool p[], const unsigned long block_size) {
-	int  my_idx = threadIdx.x;
+	int my_idx = threadIdx.x;
 	unsigned long lower = block_size * my_idx + 5;
 	unsigned long upper = block_size * (my_idx + 1) + 5;
 	p[my_idx] = true;
-	for (unsigned long i = lower; i * i < upper; i += 6) {
+	for (unsigned long i = lower; i < upper; i += 6) {
 		if (n % i == 0) {
 			p[my_idx] = false;
 			return;
@@ -58,7 +59,6 @@ bool is_prime(const unsigned long n, int blk_ct, int th_per_blk) {
 	cudaDeviceSynchronize();
 	for (int i = 0; i < th_per_blk; i++) {
 		if (p[i] == false) {
-			cudaFree(p);
 			return false;
 		}
 	}
