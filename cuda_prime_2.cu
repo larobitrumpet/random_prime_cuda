@@ -21,7 +21,7 @@ unsigned long random_number(unsigned long lower, FILE* urandom) {
 }
 
 __global__ void is_prime_part(const unsigned long n, bool p[], const unsigned long block_size) {
-	int my_idx = threadIdx.x;
+	int my_idx = blockDim.x * blockIdx.x + threadIdx.x;
 	unsigned long lower = block_size * my_idx + 5;
 	unsigned long upper = block_size * (my_idx + 1) + 5;
 	p[my_idx] = true;
@@ -52,12 +52,12 @@ bool is_prime(const unsigned long n, int blk_ct, int th_per_blk) {
 	unsigned long block_size = sqrt(n) / (blk_ct * th_per_blk);
 	block_size += 6 - (block_size % 6);
 	bool* p;
-	cudaMallocManaged(&p, th_per_blk*sizeof(bool));
+	cudaMallocManaged(&p, blk_ct * th_per_blk * sizeof(bool));
 
 	is_prime_part<<<blk_ct, th_per_blk>>>(n, p, block_size);
 
 	cudaDeviceSynchronize();
-	for (int i = 0; i < th_per_blk; i++) {
+	for (int i = 0; i < blk_ct * th_per_blk; i++) {
 		if (p[i] == false) {
 			return false;
 		}
@@ -74,11 +74,10 @@ int main() {
 		exit(1);
 	}
 	
-	int blk_ct = 1;
-	int th_per_blk = 32;
+	int blk_ct = 128;
+	int th_per_blk = 512;
 	unsigned long lower = (unsigned long)1 << 32 + 1;
 	unsigned long rand = random_number(lower, urandom);
-	bool noprime = true;
 
 	while (true) {
 		if (is_prime(rand, blk_ct, th_per_blk)) {
