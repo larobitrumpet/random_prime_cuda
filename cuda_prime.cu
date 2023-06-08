@@ -52,6 +52,7 @@ __global__ void is_prime(const unsigned long n, bool p[]) {
 }
 
 int main() {
+
 	FILE* urandom = fopen("/dev/urandom", "rb");
 	if (urandom == NULL) {
 		printf("Cannot open `/dev/urandom`\n");
@@ -66,6 +67,14 @@ int main() {
 
 	cudaMallocManaged(&is_p, th_per_blk*sizeof(bool));
 
+	// Time varaibles
+	cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+	// Start timer here
+	cudaEventRecord(start);
+
 	while (noprime) {
 		is_prime<<<blk_ct, th_per_blk>>>(rand, is_p);
 		cudaDeviceSynchronize();
@@ -78,6 +87,17 @@ int main() {
 			}
 		}
 	}
+
+	// Stop timer
+	cudaEventRecord(stop);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stop);
+
+	// Show time
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+	printf("Time elapsed: %f milliseconds\n", milliseconds);
 
 	fclose(urandom);
 	cudaFree(is_p);

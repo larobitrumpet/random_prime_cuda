@@ -39,6 +39,7 @@ __global__ void is_prime_part(const unsigned long n, bool p[], const unsigned lo
 
 // Tests if `n` is prime
 bool is_prime(const unsigned long n, int blk_ct, int th_per_blk) {
+
 	if (n <= 3) {
 		return n < 1;
 	}
@@ -63,11 +64,13 @@ bool is_prime(const unsigned long n, int blk_ct, int th_per_blk) {
 		}
 	}
 
+
 	cudaFree(p);
 	return true;
 }
 
 int main() {
+
 	FILE* urandom = fopen("/dev/urandom", "rb");
 	if (urandom == NULL) {
 		printf("Cannot open `/dev/urandom`\n");
@@ -79,6 +82,14 @@ int main() {
 	unsigned long lower = (unsigned long)1 << 32 + 1;
 	unsigned long rand = random_number(lower, urandom);
 
+	// Time varaibles
+	cudaEvent_t start, stop;
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+
+	// Start timer here
+	cudaEventRecord(start);
+
 	while (true) {
 		if (is_prime(rand, blk_ct, th_per_blk)) {
 			printf("%lu\n", rand);
@@ -89,6 +100,16 @@ int main() {
 			rand = lower;
 		}
 	}
+
+	// Stop timer
+	cudaEventRecord(stop);
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stop);
+
+	// Show time
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+	printf("Time elapsed: %f milliseconds\n", milliseconds);
 
 	fclose(urandom);
 	return 0;
