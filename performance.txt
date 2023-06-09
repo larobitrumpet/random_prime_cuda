@@ -1,9 +1,14 @@
 Block count: 1, threads per block: 32
 Average serial runtime: 38438.18 ms
 Average cuda(slow) version: 247782.33 ms
+Speedup of cuda(slow): 0.155
 Average cuda(fast) version: 38191.24 ms
+Speedup of cuda(fast): 1.006
+
 
 Block count: 128, threads per block: 512
 Average serial runtime: 38438.18 ms
 Average cuda(slow) version: > 100 hrs
+Speedup of cuda(slow):
 Average cuda(fast) version: 177.39 ms
+Speedup of cuda(fast): 216.687
