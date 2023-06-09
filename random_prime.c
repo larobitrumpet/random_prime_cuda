@@ -24,7 +24,6 @@ unsigned long random_number(unsigned long lower, FILE* urandom) {
  * Tests if `n` is prime * 
  * @param n is the number which will be tested
  */
-
 bool is_prime(unsigned long n) {
     if (n <= 3)
         return n < 1;

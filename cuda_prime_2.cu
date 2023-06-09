@@ -79,6 +79,8 @@ bool is_prime(const unsigned long n, int blk_ct, int th_per_blk) {
 	cudaDeviceSynchronize();
 	for (int i = 0; i < blk_ct * th_per_blk; i++) {
 		if (p[i] == false) {
+
+			cudaFree(p);
 			return false;
 		}
 	}
