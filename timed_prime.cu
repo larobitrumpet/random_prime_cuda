@@ -3,29 +3,11 @@
 #include <stdbool.h>
 #include <cuda.h>
 
-/**
- * Generates a random unsigned long greater than `lower`
- *
- * @param lower is lower bound of generated number
- * @param urandom is a file descriptor pointing to `/dev/urandom`
- */
-unsigned long random_number(unsigned long lower, FILE *urandom)
-{
-	unsigned long n = 0;
-	while (n < lower)
-	{
-		size_t read = fread(&n, sizeof(unsigned long), 1, urandom);
-		if (read != 1)
-		{
-			printf("Error reading `/dev/urandom`\n");
-		}
-	}
-	if (n % 2 == 0)
-	{
-		n++;
-	}
-	return n;
-}
+/*
+THIS TESTS RUNTIME WITH NUMBER 11058056269920516451
+COUNT THE TIME FOR USING ABOVE SEED TO GENERATES A PRIME NUMBER
+*/
+
 
 /**
  * Tests if `n` is prime and stores the result in `p[threadIdx.x]`
@@ -81,17 +63,10 @@ __global__ void is_prime(const unsigned long n, bool p[])
 int main()
 {
 
-	FILE *urandom = fopen("/dev/urandom", "rb");
-	if (urandom == NULL)
-	{
-		printf("Cannot open `/dev/urandom`\n");
-		exit(1);
-	}
-
-	// 1 block * 32 threads = 32 threads in total
+	// Initially, 128 block * 512 thread per block = 65536 threads
 	int blk_ct = 1;
 	int th_per_blk = 32;
-	unsigned long rand = random_number((unsigned long)1 << 32, urandom);
+	unsigned long rand = 11058056269920516451;
 	bool *is_p;
 	bool noprime = true;
 
@@ -132,7 +107,6 @@ int main()
 	cudaEventElapsedTime(&milliseconds, start, stop);
 	printf("Time elapsed: %f milliseconds\n", milliseconds);
 
-	fclose(urandom);
 	cudaFree(is_p);
 	return 0;
 }
