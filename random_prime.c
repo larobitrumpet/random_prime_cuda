@@ -85,10 +85,10 @@ int main() {
     unsigned long n = random_prime((unsigned long)1 << 32, urandom);
 
     end_time = clock();
-    time_elapsed = ((double) (end_time - start_time)) / (CLOCKS_PER_SEC * 1000);
+    time_elapsed = ((double) (end_time - start_time)) / CLOCKS_PER_SEC * 1000;
 
     printf("Prime num: %lu\n", n);
-    printf("Time elapsed: %d milliseconds\n",time_elapsed);
+    printf("Time elapsed: %f milliseconds\n",time_elapsed);
 
     fclose(urandom);
     return 0;
