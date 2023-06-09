@@ -145,6 +145,6 @@ int main(int argc, char *argv[])
 	printf("Time elapsed: %f milliseconds\n", milliseconds);
 
 
-	fclose(urandom);
+	//fclose(urandom); not used in this case
 	return 0;
 }
