@@ -118,7 +118,7 @@ int main() {
 
 	while (true) {
 		if (is_prime(rand, blk_ct, th_per_blk)) {
-			printf("%lu\n", rand);
+			printf("\nPrime num: %lu\n", rand);
 			break;
 		}
 		rand += 2;

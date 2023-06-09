@@ -99,7 +99,7 @@ int main() {
 
 		for(int i=0; i<th_per_blk; i++) {
 			if (is_p[i]) {
-				printf("%d: %lu\n", is_p[i], rand+i*2);
+				printf("\nPrime num(%d): %lu\n", is_p[i], rand+i*2);
 				noprime = false;
 				break;
 			}
