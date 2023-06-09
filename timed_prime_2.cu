@@ -4,29 +4,11 @@
 #include <math.h>
 #include <cuda.h>
 
-/**
- * Generates a random unsigned long greater than `lower`
- *
- * @param lower is lower bound of generated number
- * @param urandom is a file descriptor pointing to `/dev/urandom`
- */
-unsigned long random_number(unsigned long lower, FILE *urandom)
-{
-	unsigned long n = 0;
-	while (n < lower)
-	{
-		size_t read = fread(&n, sizeof(unsigned long), 1, urandom);
-		if (read != 1)
-		{
-			printf("Error reading `/dev/urandom`\n");
-		}
-	}
-	if (n % 2 == 0)
-	{
-		n++;
-	}
-	return n;
-}
+/*
+THIS TESTS RUNTIME WITH NUMBER 11058056269920516451
+COUNT THE TIME FOR USING ABOVE SEED TO GENERATES A PRIME NUMBER
+*/
+
 
 /**
  * Tests if `n` is prime and stores the result in `p[threadIdx.x]`
@@ -112,18 +94,11 @@ bool is_prime(const unsigned long n, int blk_ct, int th_per_blk)
 int main(int argc, char *argv[])
 {
 
-	FILE *urandom = fopen("/dev/urandom", "rb");
-	if (urandom == NULL)
-	{
-		printf("Cannot open `/dev/urandom`\n");
-		exit(1);
-	}
-
 	// Initially, 128 block * 512 thread per block = 65536 threads
 	int blk_ct = 128;
 	int th_per_blk = 512;
 	unsigned long lower = (unsigned long)1 << 32 + 1;
-	unsigned long rand = random_number(lower, urandom);
+	unsigned long rand = 11058056269920516451;
 
 	// Check if the user has provided values
 	if (argc >= 2)
@@ -134,6 +109,14 @@ int main(int argc, char *argv[])
 	{
 		th_per_blk = strtol(argv[2], NULL, 10);
 	}
+
+	// Time varaibles
+	cudaEvent_t start, stop;
+	cudaEventCreate(&start);
+	cudaEventCreate(&stop);
+
+	// Start timer here
+	cudaEventRecord(start);
 
 	while (true)
 	{
@@ -149,6 +132,17 @@ int main(int argc, char *argv[])
 			rand = lower;
 		}
 	}
+
+	// Stop timer
+	cudaEventRecord(stop);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stop);
+
+	// Show time
+	float milliseconds = 0;
+	cudaEventElapsedTime(&milliseconds, start, stop);
+	printf("Time elapsed: %f milliseconds\n", milliseconds);
 
 
 	fclose(urandom);
