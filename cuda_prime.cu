@@ -40,7 +40,7 @@ __global__ void is_prime(const unsigned long n, bool p[]) {
 		return;
 	}
 	if (my_n % 2 == 0) {
-	printf("%lu is even\n", my_n);
+		printf("%lu is even\n", my_n);
 		p[my_idx] = false;
 		return;
 	}
